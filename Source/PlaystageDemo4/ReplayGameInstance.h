@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
+#include "NetworkReplayStreaming.h"
 #include "ReplayGameInstance.generated.h"
-
 /**
  * 
  */

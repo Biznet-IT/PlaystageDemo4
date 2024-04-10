@@ -71,18 +71,18 @@ public:
 	void StartReplay(FString ReplayName);
 
 	/**  Start looking for/finding replays on the hard drive*/
-	UFUNCTION(BlueprintCallable, Category = "Replays")
-	void FindReplays();
+	/*UFUNCTION(BlueprintCallable, Category = "Replays")
+	void FindReplays();*/
 
 	/* Apply a new custom name to the replay (for UI only)*/
 	UFUNCTION(BlueprintCallable, Category = "Replays")
-	void RenameReplay(const FString& ReplayName, const FString& NewFriendlyReplayName);
+	void RenameReplay(const FString ReplayName, const FString NewFriendlyReplayName);
 
 	/** Delete a previously recorded replay*/
-	UFUNCTION(BlueprintCallable, Category = "Replays")
-	void DeleteReplay(const FString& ReplayName);
+	/**UFUNCTION(BlueprintCallable, Category = "Replays")
+	void DeleteReplay(const FString& ReplayName);*/
 
-	virtual void Init() override;
+	//virtual void Init() override;
 
 private:
 

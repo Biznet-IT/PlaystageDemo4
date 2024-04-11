@@ -4,7 +4,7 @@
 #include "ReplayPlayerController.h"
 #include "Engine/World.h"
 #include "Engine/DemoNetDriver.h"
-#include "TP_StrategyWithSteam.h"
+//#include "TP_StrategyWithSteam.h"
 
 AReplayPlayerController::AReplayPlayerController(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -30,14 +30,14 @@ bool AReplayPlayerController::SetCurrentReplayPausedState(bool bDoPause)
 		CVarAA->Set(1);
 		CVarMB->Set(0);
 
-		WorldSettings->Pauser = PlayerState;
+		WorldSettings->SetPauserPlayerState(PlayerState);
 		return true;
 	}
 	// Rest MotionBlur and AA
 	CVarAA->Set(PreviousAASetting);
 	CVarMB->Set(PreviousMBSetting);
 
-	WorldSettings->Pauser = NULL;
+	WorldSettings->SetPauserPlayerState(NULL);
 	return false;
 }
 
@@ -45,9 +45,9 @@ int32 AReplayPlayerController::GetCurrentReplayTotalTimeInSeconds() const
 {
 	if (GetWorld())
 	{
-		if (GetWorld()->GetDemoNetDriver)
+		if (GetWorld()->GetDemoNetDriver())
 		{
-			return GetWorld()->GetDemoNetDriver->DemoTotalTime;
+			return GetWorld()->GetDemoNetDriver()->GetDemoTotalTime();
 		}
 	}
 	return 0.f;
@@ -57,9 +57,9 @@ int32 AReplayPlayerController::GetCurrentReplayCurrentTimeInSeconds() const
 {
 	if (GetWorld())
 	{
-		if (GetWorld()->GetDemoNetDriver)
+		if (GetWorld()->GetDemoNetDriver())
 		{
-			return GetWorld()->GetDemoNetDriver->DemoCurrentTime;
+			return GetWorld()->GetDemoNetDriver()->GetDemoCurrentTime();
 		}
 	}
 	return 0.f;
@@ -69,9 +69,9 @@ void AReplayPlayerController::SetCurrentReplayTimeToSeconds(int32 Seconds)
 {
 	if (GetWorld())
 	{
-		if (GetWorld()->GetDemoNetDriver)
+		if (GetWorld()->GetDemoNetDriver())
 		{
-			GetWorld()->GetDemoNetDriver->GotoTimeInSeconds(Seconds);
+			GetWorld()->GetDemoNetDriver()->GotoTimeInSeconds(Seconds);
 		}
 	}
 }
@@ -80,7 +80,7 @@ void AReplayPlayerController::SetCurrentReplayPlayRate(float PlayRate)
 {
 	if (GetWorld())
 	{
-		if (GetWorld()->GetDemoNetDriver)
+		if (GetWorld()->GetDemoNetDriver())
 		{
 			GetWorld()->GetWorldSettings()->DemoPlayTimeDilation = PlayRate;
 		}

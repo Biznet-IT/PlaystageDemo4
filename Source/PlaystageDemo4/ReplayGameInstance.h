@@ -56,10 +56,13 @@ public:
 	UReplayGameInstance();
 	
 	//UPROPERTY(EditDefaultsOnly, Category = "Replays")
-	//FString RecordingName;
+	//FString ReplayName;
 
 	//UPROPERTY(EditDefaultsOnly, Category = "Replays")
-	//FString FriendlyRecordingName;
+	//FString FriendlyName;
+
+	/*UPROPERTY(EditDefaultsOnly, Category = "Replays")
+	FString NewFriendlyReplayName;*/
 
 	UFUNCTION(BlueprintCallable, Category = "Replays")
 	void StartRecording(FString ReplayName, FString FriendlyName);
@@ -71,18 +74,18 @@ public:
 	void StartReplay(FString ReplayName);
 
 	/**  Start looking for/finding replays on the hard drive*/
-	/*UFUNCTION(BlueprintCallable, Category = "Replays")
-	void FindReplays();*/
+	UFUNCTION(BlueprintCallable, Category = "Replays")
+	void FindReplays();
 
 	/* Apply a new custom name to the replay (for UI only)*/
 	UFUNCTION(BlueprintCallable, Category = "Replays")
 	void RenameReplay(const FString ReplayName, const FString NewFriendlyReplayName);
 
 	/** Delete a previously recorded replay*/
-	/**UFUNCTION(BlueprintCallable, Category = "Replays")
-	void DeleteReplay(const FString& ReplayName);*/
+	UFUNCTION(BlueprintCallable, Category = "Replays")
+	void DeleteReplay( const FString& ReplayName);
 
-	//virtual void Init() override;
+	virtual void Init() override;
 
 private:
 
@@ -96,12 +99,18 @@ private:
 	void OnEnumerateStreamsComplete(const TArray<FNetworkReplayStreamInfo, FDefaultAllocator>& StreamInfos);
 
 	FEnumerateStreamsCallback OnEnumerateStreamsCallbackDelegate;
-	void OnEnumerateStreamsCallback(const TArray<FNetworkReplayStreamInfo, FDefaultAllocator>& StreamInfos);
+	void OnEnumerateStreamsCallback(const FEnumerateStreamsResult& res);
 
 	// for DeleteReplays(..)
 	FOnDeleteFinishedStreamComplete OnDeleteFinishedStreamCompleteDelegate;
-
 	void OnDeleteFinishedStreamComplete(const bool bDeleteSucceeded);
+
+	FDeleteFinishedStreamCallback OnDeleteFinishedStreamCallbackDelegate;
+	void OnDeleteFinishedStreamCallback(const FDeleteFinishedStreamResult& res);
+
+	FDeleteFinishedStreamResult OnDeleteFinishedStreamResultDelegate;
+	void OnDeleteFinishedStreamResult(const bool bDeleteSuceeded);
+	//FDeleteFinishedStreamCallback
 
 protected:
 	UFUNCTION(BlueprintImplementableEvent, Category= "Replays")

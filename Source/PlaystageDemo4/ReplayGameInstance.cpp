@@ -7,8 +7,8 @@
 
 UReplayGameInstance::UReplayGameInstance()
 {
-	//RecordingName = "MyReplay";
-	//FriendlyRecordingName = "My Replay";
+	//ReplayName = "MyReplay";
+	//FriendlyName = "My Replay";
 }
 
 void UReplayGameInstance::StartRecording(FString ReplayName, FString FriendlyName)
@@ -21,7 +21,7 @@ void UReplayGameInstance::StopRecording()
 	StopRecordingReplay();
 }
 
-void UReplayGameInstance::StartReplay(FString ReplayName)
+void UReplayGameInstance::StartReplay( FString ReplayName)
 {
 	PlayReplay(ReplayName);
 }
@@ -31,12 +31,12 @@ void UReplayGameInstance::FindReplays()
 	if (EnumerateStreamsPtr.Get())
 	{
 		const TArray<FString> extra;
-		const FEnumerateStreamsCallback callback = OnEnumerateStreamsComplete;
+		const FEnumerateStreamsCallback callback = OnEnumerateStreamsCallbackDelegate;
 		EnumerateStreamsPtr.Get()->EnumerateStreams(FNetworkReplayVersion(), int32(), FString(), extra, callback);
 	}
 }
 
-void UReplayGameInstance::RenameReplay(const FString& ReplayName, const FString& NewFriendlyReplayName)
+void UReplayGameInstance::RenameReplay(const FString ReplayName, const FString NewFriendlyReplayName)
 {
 	//Get File Info
 	FNullReplayInfo Info;
@@ -46,9 +46,9 @@ void UReplayGameInstance::RenameReplay(const FString& ReplayName, const FString&
 	const FString StreamFullBaseFilename = FPaths::Combine(*StreamDirectory, *ReplayName);
 	const FString InfoFilename = StreamFullBaseFilename + TEXT(".replayinfo");
 
-	TUniquePtr &InfoFileArchive(IFileManager::Get().CreateFileReader(*InfoFilename));
+	TUniquePtr<FArchive> InfoFileArchive(IFileManager::Get().CreateFileReader(*InfoFilename));
 
-	if (InfoFileArchive.IsValidIndex() && InfoFileArchive->TotalSize() != 0)
+	if (InfoFileArchive.IsValid() && InfoFileArchive->TotalSize() != 0)
 	{ 
 		FString JsonString;
 		*InfoFileArchive << JsonString;
@@ -78,7 +78,11 @@ void UReplayGameInstance::DeleteReplay(const FString& ReplayName)
 {
 	if (EnumerateStreamsPtr.Get())
 	{
-		EnumerateStreamsPtr.Get()->DeleteFinishedStream(ReplayName, OnDeleteFinishedStreamCompleteDelegate);
+		//const FString& StreamName, const FDeleteFinishedStreamCallback& Delegate
+		//EnumerateStreamsPtr.Get()->DeleteFinishedStream(ReplayName, OnDeleteFinishedStreamCompleteDelegate);		
+		const FDeleteFinishedStreamCallback &call = OnDeleteFinishedStreamCallbackDelegate;
+		EnumerateStreamsPtr.Get()->DeleteFinishedStream(ReplayName, call);
+
 	}
 }
 
@@ -89,11 +93,16 @@ void UReplayGameInstance::Init()
 	// create a ReplayStreamer for FindReplasys() and DeleteReplay(..)
 	EnumerateStreamsPtr = FNetworkReplayStreaming::Get().GetFactory().CreateReplayStreamer();
 	// Link FindReplays() delegate to function
-	OnEnumerateStreamsCompleteDelegate = FOnEnumerateStreamsComplete::CreateUObject(this, &UReplayGameInstance::OnDeleteFinishedStreamComplete);
+	//OnEnumerateStreamsCompleteDelegate = FOnEnumerateStreamsComplete::CreateUObject(this, &UReplayGameInstance::OnEnumerateStreamsComplete);
+	OnEnumerateStreamsCallbackDelegate = FEnumerateStreamsCallback::CreateUObject(this, &UReplayGameInstance::OnEnumerateStreamsCallback);
 	// Link DeleteReplay() delegate to function
-	OnDeleteFinishedStreamCompleteDelegate = FOnDeleteFinishedStreamComplete::CreateUObject(this, &UReplayGameInstance::OnDeleteFinishedStreamComplete);
+	//OnDeleteFinishedStreamCompleteDelegate = FOnDeleteFinishedStreamComplete::CreateUObject(this, &UReplayGameInstance::OnDeleteFinishedStreamComplete);
 
-	OnEnumerateStreamsCallbackDelegate = FEnumerateStreamsCallback::CreateUObject(this, &UReplayGameInstance::OnEnumerateStreamsCallback)
+	OnDeleteFinishedStreamCallbackDelegate = FDeleteFinishedStreamCallback::CreateUObject(this, &UReplayGameInstance::OnDeleteFinishedStreamCallback);
+
+	//FDeleteFinishedStreamCallback OnDeleteFinishedStreamCallbackDelegate;
+	//void OnDeleteFinishedStreamCallback(const bool bDeleteSuceeded);
+
 }
 
 void UReplayGameInstance::OnEnumerateStreamsComplete(const TArray<FNetworkReplayStreamInfo, FDefaultAllocator> &StreamInfos)
@@ -109,7 +118,7 @@ void UReplayGameInstance::OnEnumerateStreamsComplete(const TArray<FNetworkReplay
 	BP_OnFindReplaysComplete(AllReplays);
 }
 
-void UReplayGameInstance::OnEnumerateStreamsCallback(const TArray<FNetworkReplayStreamInfo, FDefaultAllocator>& StreamInfos)
+/*void UReplayGameInstance::OnEnumerateStreamsCallback(const TArray<FNetworkReplayStreamInfo, FDefaultAllocator>& StreamInfos)
 {
 	TArray<FS_ReplayInfo> AllReplays;
 	for (FNetworkReplayStreamInfo StreamInfo : StreamInfos)
@@ -120,9 +129,27 @@ void UReplayGameInstance::OnEnumerateStreamsCallback(const TArray<FNetworkReplay
 		}
 	}
 	BP_OnFindReplaysComplete(AllReplays);
+}*/
+
+void UReplayGameInstance::OnEnumerateStreamsCallback(const FEnumerateStreamsResult &StreamInfos)
+{
+	TArray<FS_ReplayInfo> AllReplays;
+	for (const FNetworkReplayStreamInfo& StreamInfo : StreamInfos.FoundStreams)
+	{
+		if (!StreamInfo.bIsLive)
+		{
+			AllReplays.Add(FS_ReplayInfo(StreamInfo.Name, StreamInfo.FriendlyName, StreamInfo.Timestamp, StreamInfo.LengthInMS));
+		}
+	}
+	BP_OnFindReplaysComplete(AllReplays);
 }
 
-void UReplayGameInstance::OnDeleteFinishedStreamComplete(const bool bDeleteSucceeded)
+/*void UReplayGameInstance::OnDeleteFinishedStreamComplete(const bool bDeleteSucceeded)
+{
+	FindReplays();
+}*/
+
+void UReplayGameInstance::OnDeleteFinishedStreamCallback(const FDeleteFinishedStreamResult &res)
 {
 	FindReplays();
 }

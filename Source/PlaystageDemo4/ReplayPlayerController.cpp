@@ -4,7 +4,7 @@
 #include "ReplayPlayerController.h"
 #include "Engine/World.h"
 #include "Engine/DemoNetDriver.h"
-//#include "TP_StrategyWithSteam.h"
+
 
 AReplayPlayerController::AReplayPlayerController(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -17,25 +17,25 @@ bool AReplayPlayerController::SetCurrentReplayPausedState(bool bDoPause)
 {
 	AWorldSettings* WorldSettings = GetWorldSettings();
 	//Set MotionBlur off and Anti Aliasing to FXAA in order to bypass the pause-bug of both
-	static const auto CVarAA = IConsoleManager::Get().FindConsoleVariable(TEXT("DefaultFeature.AntiAliasing"));
+	//static const auto CVarAA = IConsoleManager::Get().FindConsoleVariable(TEXT("DefaultFeature.AntiAliasing"));
 
-	static const auto CVarMB = IConsoleManager::Get().FindConsoleVariable(TEXT("DefaultFeature.MotionBlur"));
+	//static const auto CVarMB = IConsoleManager::Get().FindConsoleVariable(TEXT("DefaultFeature.MotionBlur"));
 
 	if (bDoPause)
 	{
-		PreviousAASetting = CVarAA->GetInt();
-		PreviousMBSetting = CVarMB->GetInt();
+		//PreviousAASetting = CVarAA->GetInt();
+		//PreviousMBSetting = CVarMB->GetInt();
 
 		// Set MotionBlur to OFF, Anti-Aliasing to FXAA
-		CVarAA->Set(1);
-		CVarMB->Set(0);
+		//CVarAA->Set(1);
+		//CVarMB->Set(0);
 
 		WorldSettings->SetPauserPlayerState(PlayerState);
 		return true;
 	}
 	// Rest MotionBlur and AA
-	CVarAA->Set(PreviousAASetting);
-	CVarMB->Set(PreviousMBSetting);
+	//CVarAA->Set(PreviousAASetting);
+	//CVarMB->Set(PreviousMBSetting);
 
 	WorldSettings->SetPauserPlayerState(NULL);
 	return false;

@@ -41,8 +41,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "CurrentReplay")
 	void SetCurrentReplayPlayRate(float PlayRate = 1.f);
 
-protected:
+//protected:
 	/*   for saving Anti - Aliasing and Motion - Blur settings during Pause State */ 
-	int32 PreviousAASetting;
-	int32 PreviousMBSetting;
+	//int32 PreviousAASetting;
+	//int32 PreviousMBSetting;
 };

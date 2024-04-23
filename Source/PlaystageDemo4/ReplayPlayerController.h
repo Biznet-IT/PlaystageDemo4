@@ -4,45 +4,78 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "GameFramework/PlayerState.h"
+#include "GameFramework/Pawn.h"
+#include "GameFramework/PawnMovementComponent.h"
+#include "ReplayPlayerState.h"
 #include "ReplayPlayerController.generated.h"
 
 /**
  * 
  */
-UCLASS()
+UENUM(BlueprintType)
+enum class EVRMoveMode : uint8
+{
+    FLY         UMETA(DisplayName = "Fly Mode"),
+    TELEPORT    UMETA(DisplayName = "Teleport Mode"),
+    MOTION      UMETA(DisplayName = "Motion Controller Mode"),
+    HYBRID      UMETA(DisplayName = "Hybrid Mode")
+};
+
+UCLASS(config = Game)
 class PLAYSTAGEDEMO4_API AReplayPlayerController : public APlayerController
 {
-	GENERATED_BODY()
-
 public:
+    GENERATED_UCLASS_BODY()
 
-	//UFUNCTION(BlueprintCallable, Category = "Replays")
-	//void RestartRecording();
+    virtual void SetupInputComponent() override;
+    virtual void InitPlayerState() override;
 
-	AReplayPlayerController(const FObjectInitializer& ObjectInitializer);
+    //Change from spectating, to playing, etc
+    UFUNCTION(BlueprintCallable, Category = "ReplayPlayerController")
+    virtual void ChangeState(FName NewState) override;
 
-	/* Set the Paused State of the Running Replay to bDoPause. Return new Pause State */
-	UFUNCTION(BlueprintCallable, Category = "CurrentReplay")
-	bool SetCurrentReplayPausedState(bool bDoPause);
+    //Pawn possession
+    virtual void OnPossess(APawn* aPawn) override;
+    
+    //Take over pawn for VR mode
+    UFUNCTION(BlueprintCallable, Category = "ReplayPlayerController")
+    virtual void TakeOverVRPawn(APawn* aPawn);
 
-	/* Gets the Max Number of Seconds that were recorded in the current Replay */
-	UFUNCTION(BlueprintCallable, Category = "CurrentReplay")
-	int32 GetCurrentReplayTotalTimeInSeconds() const;
+	//Release pawn for VR mode
+    UFUNCTION(BlueprintCallable, Category = "ReplayPlayerController")
+    virtual void ReleaseVRPawn();
 
-	/* Gets the Second we are currently watching in the Replay */
-	UFUNCTION(BlueprintCallable, Category = "CurrentReplay")
-	int32 GetCurrentReplayCurrentTimeInSeconds() const;
+    void OnToggleInGameMenu();
 
-	/* Jumps to the specified Second in the Replay we are watching */
-	UFUNCTION(BlueprintCallable, Category = "CurrentReplay")
-	void SetCurrentReplayTimeToSeconds(int32 Seconds);
+    //Increase PlayRate
+    UFUNCTION(BlueprintCallable, Category = "ReplayPlayerController")
+    void OnIncreasePlaybackSpeed();
 
-	/* Changes the PlayRate of the Replay we are watching, enabling FastForward or SlowMotion */
-	UFUNCTION(BlueprintCallable, Category = "CurrentReplay")
-	void SetCurrentReplayPlayRate(float PlayRate = 1.f);
+    //Decrease PlayRate
+    UFUNCTION(BlueprintCallable, Category = "ReplayPlayerController")
+    void OnDecreasePlaybackSpeed();
 
-//protected:
-	/*   for saving Anti - Aliasing and Motion - Blur settings during Pause State */ 
-	//int32 PreviousAASetting;
-	//int32 PreviousMBSetting;
+    //Get Current Playback Rate
+    UFUNCTION(BlueprintCallable, Category = "ReplayPlayerController")
+    float GetPlaybackSpeed();
+
+    //Available Playback Rates
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ReplayPlayerController")
+    TArray<float> ReplayPlaybackSpeeds;
+
+    //Current Playback setting
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ReplayPlayerController")
+    int32 PlaybackSpeed = 2;
+
+    //Bring up the in-game menu
+    UFUNCTION(BlueprintCallable, Category = "ReplayPlayerController")
+    void BP_ToggleInGameMenu();
+
+    //Take Screenshot
+    UFUNCTION(BlueprintCallable, Category = "ReplayPlayerController")
+    void OnTakeScreenShot();
+
+protected:
+    virtual void BeginPlay() override;
 };

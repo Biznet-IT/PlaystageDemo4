@@ -377,9 +377,10 @@ void UReplayGameInstance::PlayQueueReplay()
 //Delete requested replay by name
 void UReplayGameInstance::DeleteReplay(const FString ReplayName)
 {
-    //if (ReplayStreamer.IsValid())
+    if (ReplayStreamer.IsValid())
     {
-      //  ReplayStreamer->DeleteFinishedStream(ReplayName, FDeleteFinishedStreamCallback::CreateUObject(this, &UReplayGameInstance::OnDeleteFinishedStreamComplete));
+        ReplayStreamer->DeleteFinishedStream(ReplayName, FDeleteFinishedStreamCallback::CreateUObject(this, &UReplayGameInstance::OnDeleteFinishedStreamComplete));
+
     }
 }
 

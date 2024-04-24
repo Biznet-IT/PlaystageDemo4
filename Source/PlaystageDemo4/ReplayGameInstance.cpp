@@ -50,6 +50,7 @@ void UReplayGameInstance::BuildReplayList()
     {
         bUpdatingReplayList = true;
         ReplayStreamer->EnumerateStreams(FNetworkVersion::GetReplayVersion(), 0, FString(), TArray<FString>(), FEnumerateStreamsCallback::CreateUObject(this, &UReplayGameInstance::OnEnumerateStreamsComplete));
+        
     }
 }
 
@@ -375,12 +376,31 @@ void UReplayGameInstance::PlayQueueReplay()
 }
 
 //Delete requested replay by name
-void UReplayGameInstance::DeleteReplay(const FString ReplayName)
-{
-    if (ReplayStreamer.IsValid())
-    {
-        ReplayStreamer->DeleteFinishedStream(ReplayName, FDeleteFinishedStreamCallback::CreateUObject(this, &UReplayGameInstance::OnDeleteFinishedStreamComplete));
+//void UReplayGameInstance::DeleteReplay(const FString ReplayName)
+//{
+    //if (ReplayStreamer.IsValid())
+    //{
+        //ReplayStreamer->DeleteFinishedStream(ReplayName, FDeleteFinishedStreamCallback::CreateUObject(this, &UReplayGameInstance::OnDeleteFinishedStreamComplete));
+    //}
+  //  if (ReplayStreamer.Get())
+    //{
+      //  const FDeleteFinishedStreamCallback& call = OnDeleteFinishedStreamCompleteCallbackDelegate;
+        //ReplayStreamer->DeleteFinishedStream(ReplayName, call);
+    //}
+//}
 
+void UReplayGameInstance::StartReplay(const FString ReplayName)
+{
+    PlayReplay(ReplayName);
+}
+
+//Delete requested replay by name
+void UReplayGameInstance::DeleteReplay(const FString& ReplayName)
+{
+    if (ReplayStreamer.Get())
+    {
+        const FDeleteFinishedStreamCallback& call = OnDeleteFinishedStreamCompleteCallbackDelegate;
+        ReplayStreamer->DeleteFinishedStream(ReplayName, call);
     }
 }
 
@@ -458,4 +478,16 @@ bool UReplayGameInstance::Tick(float DeltaTime)
     }
 
     return true;
+}
+
+void UReplayGameInstance::OnDeleteFinishedStreamComplete(const bool bDeleteSucceeded)
+{
+    //Refresh the replay list
+    BuildReplayList();
+}
+
+void UReplayGameInstance::OnDeleteFinishedStreamCompleteCallback(const FDeleteFinishedStreamResult Result)
+{
+    //Refresh the replay list
+    BuildReplayList();
 }

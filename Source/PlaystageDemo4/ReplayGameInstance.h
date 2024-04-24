@@ -152,9 +152,13 @@ public:
     FString QueueReplayName;
     bool bRunQueueReplay;
 
+    //Play Replay
+    UFUNCTION(BlueprintCallable, Category = "Replays")
+    void StartReplay(const FString ReplayName);
+
     //DeleteReplay
     UFUNCTION(BlueprintCallable, Category = "Replays")
-    void DeleteReplay(const FString ReplayName);
+    void DeleteReplay(const FString& ReplayName);
 
     //Called by delegate when the replay streaming intergace has finished deleting
     void OnDeleteFinishedStreamComplete(const FDeleteFinishedStreamResult Result);
@@ -219,5 +223,14 @@ private:
 
     bool Tick(float DeltaSeconds);
     FTSTicker::FDelegateHandle TickDelegateHandle;
-	
+
+    //For DeleteReplays(...)
+    FOnDeleteFinishedStreamComplete OnDeleteFinishedStreamCompleteDelegate;
+    void OnDeleteFinishedStreamComplete(const bool bDeleteSucceeded);
+
+    FDeleteFinishedStreamCallback OnDeleteFinishedStreamCompleteCallbackDelegate;
+    void OnDeleteFinishedStreamCompleteCallback(const FDeleteFinishedStreamResult Result);
+
+    FDeleteFinishedStreamResult OnDeleteFinishedStreamCompleteResultDelegate;
+    void OnDeleteFinishedStreamResult(const bool bDeleteSucceeded);
 };

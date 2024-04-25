@@ -29,7 +29,6 @@
 		{
 			"Name": "RLPlugin",
 			"Enabled": true
-		},
-		
+		}
 	]
 }

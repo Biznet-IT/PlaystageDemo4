@@ -117,7 +117,7 @@ public:
 
     //Amount of step forward or backwards
     UPROPERTY(BlueprintReadWrite, Category = "Replays")
-    float StepSize = 10.f;
+    float StepSize = 1.f;
     
     //Pause current playing replay
     UFUNCTION(BlueprintCallable, Category = "Replays")

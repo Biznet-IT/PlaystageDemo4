@@ -98,6 +98,7 @@ void UReplayGameInstance::OnEnumerateStreamsComplete(const FEnumerateStreamsResu
                 NewReplayEntry.NumHours = StreamInfo.LengthInMS / (1000 * 3600);
                 NewReplayEntry.NumMinutes = (StreamInfo.LengthInMS % (1000 * 60)) - NewReplayEntry.NumHours * 3600;
                 NewReplayEntry.NumSeconds = (StreamInfo.LengthInMS / 1000) % 60;
+                NewReplayEntry.CameraPawnArray = TArray<AActor*>();
 
                 ReplayList.Add(NewReplayEntry);
             }

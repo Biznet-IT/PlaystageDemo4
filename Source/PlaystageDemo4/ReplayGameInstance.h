@@ -53,6 +53,14 @@ struct FS_ReplayEntry
     UPROPERTY(BlueprintReadWrite, Category = "ReplayStreamer")
     int32 NumSeconds = 0;
 
+    //UPROPERTY(BlueprintReadWrite, Category = "ReplayStreamer")
+    //TArray<u> CameraPawnArray;
+    //TArray<Object> CameraPawnArray;
+
+    //Property to define an array of pawns
+    UPROPERTY(BlueprintReadWrite, Category = "ReplayStreamer")
+    TArray<AActor*> CameraPawnArray;
+
     FS_ReplayEntry()
     {
 

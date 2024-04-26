@@ -98,7 +98,7 @@ void UReplayGameInstance::OnEnumerateStreamsComplete(const FEnumerateStreamsResu
                 NewReplayEntry.NumHours = StreamInfo.LengthInMS / (1000 * 3600);
                 NewReplayEntry.NumMinutes = (StreamInfo.LengthInMS % (1000 * 60)) - NewReplayEntry.NumHours * 3600;
                 NewReplayEntry.NumSeconds = (StreamInfo.LengthInMS / 1000) % 60;
-                NewReplayEntry.CameraPawnArray = TArray<AActor*>();
+                NewReplayEntry.CameraPawnArray = TArray<APawnCamera*>();
 
                 ReplayList.Add(NewReplayEntry);
             }
@@ -467,6 +467,32 @@ void UReplayGameInstance::StopCaptureMovie()
     //{
       //  GetWorld()->GetDemoNetDriver()->StopCaptureMovie();
     //}
+}
+
+TArray<APawnCamera*> UReplayGameInstance::GetCameraPawnArray(const FString ReplayName)
+{
+    //Return the Camera Array from FS_ReplayEntry
+    for (FS_ReplayEntry& ReplayEntry : ReplayList)
+    {
+        if (ReplayEntry.StreamInfo.Name == ReplayName)
+        {
+            return ReplayEntry.CameraPawnArray;
+        }
+    }
+    return TArray<APawnCamera*>();
+}
+
+//Set Camera Array content inside FS_ReplayEntry
+void UReplayGameInstance::SetCameraPawnArray(const FString ReplayName, TArray<APawnCamera*> CameraPawnArray)
+{
+    for (FS_ReplayEntry& ReplayEntry : ReplayList)
+    {
+        if (ReplayEntry.StreamInfo.Name == ReplayName)
+        {
+            ReplayEntry.CameraPawnArray = CameraPawnArray;
+            break;
+        }
+    }
 }
 
 bool UReplayGameInstance::Tick(float DeltaTime)

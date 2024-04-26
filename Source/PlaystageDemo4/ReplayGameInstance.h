@@ -6,6 +6,7 @@
 #include "Delegates/DelegateMacros.h"
 #include "Engine/GameInstance.h"
 #include "NetworkReplayStreaming.h"
+#include "PawnCamera.h"
 #include "ReplayGameInstance.generated.h"
 
 //Bindable blueprint delegateFOnReplayBuildListDelegate
@@ -53,13 +54,16 @@ struct FS_ReplayEntry
     UPROPERTY(BlueprintReadWrite, Category = "ReplayStreamer")
     int32 NumSeconds = 0;
 
+    UPROPERTY(BlueprintReadWrite, Category = "ReplayStreamer")
+    APawnCamera* CameraPawn;
+
     //UPROPERTY(BlueprintReadWrite, Category = "ReplayStreamer")
     //TArray<u> CameraPawnArray;
     //TArray<Object> CameraPawnArray;
 
     //Property to define an array of pawns
     UPROPERTY(BlueprintReadWrite, Category = "ReplayStreamer")
-    TArray<AActor*> CameraPawnArray;
+    TArray<APawnCamera*> CameraPawnArray;
 
     FS_ReplayEntry()
     {
@@ -219,6 +223,14 @@ public:
     //Wether we are currently building a replay list or not
     UPROPERTY(BlueprintReadWrite, Category = "ReplayStreamer")
     bool bUpdatingReplayList = false;
+
+    //Get and Set the Camera Array 
+    UFUNCTION(BlueprintCallable, Category = "ReplayStreamer")
+    TArray<APawnCamera*> GetCameraPawnArray(const FString ReplayName);
+
+    //Change the Camera Array
+    UFUNCTION(BlueprintCallable, Category = "ReplayStreamer")
+    void SetCameraPawnArray(const FString ReplayName, TArray<APawnCamera*> CameraPawnArray);
 
     //List of replays we have access to
     UPROPERTY(BlueprintReadWrite, Category = "ReplayStreamer")

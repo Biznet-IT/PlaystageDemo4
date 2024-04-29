@@ -1,9 +1,10 @@
 // Copyright 2023 Biznet It
 
+#include "ReplayGameInstance.h"
 #include "PlaystageDemo4.h"
 #include "Runtime/NetworkReplayStreaming/NullNetworkReplayStreaming/Public/NullNetworkReplayStreaming.h"
 #include "Misc/NetworkVersion.h"
-#include "ReplayGameInstance.h"
+#include <JsonObjectConverter.h>
 
 UReplayGameInstance::UReplayGameInstance()
 {
@@ -78,13 +79,13 @@ void UReplayGameInstance::DeleteReplay(const FString& ReplayName)
 {
 	if (EnumerateStreamsPtr.Get())
 	{
-		//const FString& StreamName, const FDeleteFinishedStreamCallback& Delegate
-		//EnumerateStreamsPtr.Get()->DeleteFinishedStream(ReplayName, OnDeleteFinishedStreamCompleteDelegate);		
+	
 		const FDeleteFinishedStreamCallback &call = OnDeleteFinishedStreamCallbackDelegate;
 		EnumerateStreamsPtr.Get()->DeleteFinishedStream(ReplayName, call);
 
 	}
 }
+
 
 void UReplayGameInstance::Init()
 {
@@ -92,16 +93,10 @@ void UReplayGameInstance::Init()
 
 	// create a ReplayStreamer for FindReplasys() and DeleteReplay(..)
 	EnumerateStreamsPtr = FNetworkReplayStreaming::Get().GetFactory().CreateReplayStreamer();
-	// Link FindReplays() delegate to function
-	//OnEnumerateStreamsCompleteDelegate = FOnEnumerateStreamsComplete::CreateUObject(this, &UReplayGameInstance::OnEnumerateStreamsComplete);
+
 	OnEnumerateStreamsCallbackDelegate = FEnumerateStreamsCallback::CreateUObject(this, &UReplayGameInstance::OnEnumerateStreamsCallback);
-	// Link DeleteReplay() delegate to function
-	//OnDeleteFinishedStreamCompleteDelegate = FOnDeleteFinishedStreamComplete::CreateUObject(this, &UReplayGameInstance::OnDeleteFinishedStreamComplete);
-
+	
 	OnDeleteFinishedStreamCallbackDelegate = FDeleteFinishedStreamCallback::CreateUObject(this, &UReplayGameInstance::OnDeleteFinishedStreamCallback);
-
-	//FDeleteFinishedStreamCallback OnDeleteFinishedStreamCallbackDelegate;
-	//void OnDeleteFinishedStreamCallback(const bool bDeleteSuceeded);
 
 }
 
@@ -118,18 +113,6 @@ void UReplayGameInstance::OnEnumerateStreamsComplete(const TArray<FNetworkReplay
 	BP_OnFindReplaysComplete(AllReplays);
 }
 
-/*void UReplayGameInstance::OnEnumerateStreamsCallback(const TArray<FNetworkReplayStreamInfo, FDefaultAllocator>& StreamInfos)
-{
-	TArray<FS_ReplayInfo> AllReplays;
-	for (FNetworkReplayStreamInfo StreamInfo : StreamInfos)
-	{
-		if (!StreamInfo.bIsLive)
-		{
-			AllReplays.Add(FS_ReplayInfo(StreamInfo.Name, StreamInfo.FriendlyName, StreamInfo.Timestamp, StreamInfo.LengthInMS));
-		}
-	}
-	BP_OnFindReplaysComplete(AllReplays);
-}*/
 
 void UReplayGameInstance::OnEnumerateStreamsCallback(const FEnumerateStreamsResult &StreamInfos)
 {
@@ -144,12 +127,49 @@ void UReplayGameInstance::OnEnumerateStreamsCallback(const FEnumerateStreamsResu
 	BP_OnFindReplaysComplete(AllReplays);
 }
 
-/*void UReplayGameInstance::OnDeleteFinishedStreamComplete(const bool bDeleteSucceeded)
+
+void UReplayGameInstance::AddCameraToArray(const FS_ReplayCameraInfo CameraInfo, const FString ReplayName)
 {
-	FindReplays();
-}*/
+    // Add Camera to Array
+    for (FS_ReplayCameraArray CamArray : CameraArray)
+    {
+        if (CamArray.ReplayName == ReplayName)
+        {
+            CamArray.CameraArray.Add(CameraInfo);
+            return;
+        }
+    }
+
+    //CameraArray.CameraArray.Add(CameraInfo);
+}
+
+void UReplayGameInstance::RemoveCameraFromArray(const int Index, const FString ReplayName)
+{
+    // Remove Camera from Array
+    for (FS_ReplayCameraArray CamArray : CameraArray)
+    {
+        if (CamArray.ReplayName == ReplayName)
+        {
+            CamArray.CameraArray.RemoveAt(Index);
+            return;
+        }
+    }
+    //WCameraArray.CameraArray.RemoveAt(Index);
+}
 
 void UReplayGameInstance::OnDeleteFinishedStreamCallback(const FDeleteFinishedStreamResult &res)
 {
 	FindReplays();
 }
+
+
+
+void UReplayGameInstance::OverwriteReplay(const FString& ReplayName)
+{
+    if (EnumerateStreamsPtr.Get())
+    {
+        const FDeleteFinishedStreamCallback& call = OnDeleteFinishedStreamCallbackDelegate;
+        EnumerateStreamsPtr.Get()->DeleteFinishedStream(ReplayName, call);
+    }
+}
+

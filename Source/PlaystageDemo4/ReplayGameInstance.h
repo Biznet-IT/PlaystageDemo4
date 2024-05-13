@@ -24,12 +24,12 @@ struct FS_ReplayInfo
 	FDateTime Timestamp;
 
 	UPROPERTY(BlueprintReadOnly)
-	int32 LenghtInMS;
+	float LenghtInMS;
 
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsValid;
 
-	FS_ReplayInfo(FString NewName, FString NewFriendlyName, FDateTime NewTimestamp, int32 NewLenghtInMS)
+	FS_ReplayInfo(FString NewName, FString NewFriendlyName, FDateTime NewTimestamp, float NewLenghtInMS)
 	{
 		ReplayName = NewName;
 		FriendlyName = NewFriendlyName;

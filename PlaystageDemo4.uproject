@@ -63,6 +63,11 @@
 		{
 			"Name": "JWT",
 			"Enabled": true
+		},
+		{
+			"Name": "JSONExtension",
+			"Enabled": true,
+			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/c53fca8404de41788912f5a09ff4ea4e"
 		}
 	]
 }

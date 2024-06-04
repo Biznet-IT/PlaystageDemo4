@@ -156,6 +156,10 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Replays")
     void OverwriteReplay(const FString& ReplayName);
 
+    /* Play replay from the start */
+    UFUNCTION(BlueprintCallable, Category = "Replays")
+    void PlayReplayFromStart(const FString& ReplayName, float StartTime = 0.0f);
+
     /* Stop the replay and go back*/
     //UFUNCTION(BlueprintCallable, Category = "Replays")
     //void StopReplay();

@@ -75,6 +75,11 @@ void UReplayGameInstance::RenameReplay(const FString ReplayName, const FString N
 	}
 }
 
+void UReplayGameInstance::PlayReplayFromStart(const FString& ReplayName, float StartTime)
+{
+    PlayReplay(ReplayName);
+}
+
 void UReplayGameInstance::DeleteReplay(const FString& ReplayName)
 {
 	if (EnumerateStreamsPtr.Get())

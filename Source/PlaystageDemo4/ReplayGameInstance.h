@@ -24,12 +24,12 @@ struct FS_ReplayInfo
 	FDateTime Timestamp;
 
 	UPROPERTY(BlueprintReadOnly)
-	int32 LenghtInMS;
+	float LenghtInMS;
 
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsValid;
 
-	FS_ReplayInfo(FString NewName, FString NewFriendlyName, FDateTime NewTimestamp, int32 NewLenghtInMS)
+	FS_ReplayInfo(FString NewName, FString NewFriendlyName, FDateTime NewTimestamp, float NewLenghtInMS)
 	{
 		ReplayName = NewName;
 		FriendlyName = NewFriendlyName;
@@ -47,6 +47,82 @@ struct FS_ReplayInfo
 		bIsValid = false;
 	}
 };
+USTRUCT(BlueprintType)
+struct FS_ReplayCameraInfo
+{
+    GENERATED_USTRUCT_BODY()
+
+    UPROPERTY(BlueprintReadOnly)
+    FString CameraName;
+
+    UPROPERTY(BlueprintReadOnly)
+    int32 CameraDuration;
+
+    UPROPERTY(BlueprintReadOnly)
+    FVector CameraLocation;
+
+    UPROPERTY(BlueprintReadOnly)
+    FRotator CameraRotation;
+
+    FS_ReplayCameraInfo(FString NewCameraName, int32 NewCameraDuration, FVector NewCameraLocation, FRotator NewCameraRotation)
+    {
+        CameraName = NewCameraName;
+        CameraDuration = NewCameraDuration;
+        CameraLocation = NewCameraLocation;
+        CameraRotation = NewCameraRotation;
+    }
+
+    FS_ReplayCameraInfo()
+    {
+        CameraName = "Camera";
+        CameraDuration = 2;
+        CameraLocation = FVector(0, 0, 0);
+        CameraRotation = FRotator(0, 0, 0);
+
+    }
+};
+USTRUCT(BlueprintType)  
+struct FS_ReplayCameraArray
+{
+    GENERATED_USTRUCT_BODY()
+
+    UPROPERTY(BlueprintReadOnly)
+    TArray<FS_ReplayCameraInfo> CameraArray;
+
+    UPROPERTY(BlueprintReadOnly)
+    FString ReplayName;
+
+
+    FS_ReplayCameraArray(TArray<FS_ReplayCameraInfo> NewCameraArray)
+    {
+        CameraArray = NewCameraArray;
+    }
+
+    FS_ReplayCameraArray()
+    {
+        CameraArray = TArray<FS_ReplayCameraInfo>();
+    }
+
+    void Add(FS_ReplayCameraInfo CameraInfo)
+    {
+        CameraArray.Add(CameraInfo);
+    }
+
+    FS_ReplayCameraArray(FS_ReplayCameraArray& NewCameraArray)
+    {
+        CameraArray = NewCameraArray.CameraArray;
+    }
+
+    int Length() const
+    {
+        return CameraArray.Num();
+    }
+
+    void RemoveAt(int Index)
+    {
+        CameraArray.RemoveAt(Index);
+    }
+};
 UCLASS()
 class PLAYSTAGEDEMO4_API UReplayGameInstance : public UGameInstance
 {
@@ -54,15 +130,6 @@ class PLAYSTAGEDEMO4_API UReplayGameInstance : public UGameInstance
 
 public:
 	UReplayGameInstance();
-	
-	//UPROPERTY(EditDefaultsOnly, Category = "Replays")
-	//FString ReplayName;
-
-	//UPROPERTY(EditDefaultsOnly, Category = "Replays")
-	//FString FriendlyName;
-
-	/*UPROPERTY(EditDefaultsOnly, Category = "Replays")
-	FString NewFriendlyReplayName;*/
 
 	UFUNCTION(BlueprintCallable, Category = "Replays")
 	void StartRecording(FString ReplayName, FString FriendlyName);
@@ -85,14 +152,44 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Replays")
 	void DeleteReplay( const FString& ReplayName);
 
+    /* Overwrite a previously recorde replay */
+    UFUNCTION(BlueprintCallable, Category = "Replays")
+    void OverwriteReplay(const FString& ReplayName);
+
+    /* Play replay from the start */
+    UFUNCTION(BlueprintCallable, Category = "Replays")
+    void PlayReplayFromStart(const FString& ReplayName, float StartTime = 0.0f);
+
+    /* Stop the replay and go back*/
+    //UFUNCTION(BlueprintCallable, Category = "Replays")
+    //void StopReplay();
+
+    /* Save Camera to array*/
+    //UFUNCTION(BlueprintCallable, Category = "Replays")
+    //void SaveCamera(const FString& CameraName, const int32 CameraDuration, const FVector CameraLocation, const FRotator CameraRotation);
+
+    /* add to array */
+    UFUNCTION(BlueprintCallable, Category = "Replays")
+    void AddCameraToArray(const FS_ReplayCameraInfo CameraInfo, const FString ReplayName);
+
+    /* Remove from array */
+    UFUNCTION(BlueprintCallable, Category = "Replays")
+    void RemoveCameraFromArray(const int Index, const FString ReplayName);
+
+
+    /* Declare Camera Array */
+    UPROPERTY(BlueprintReadOnly)
+    TArray<FS_ReplayCameraArray> CameraArray;
+
+
 	virtual void Init() override;
+
+
 
 private:
 
 	// for FindReplays()
 	TSharedPtr<INetworkReplayStreamer> EnumerateStreamsPtr;
-	//TSharedPtr<FOnDeleteFinishedStreamComplete> EnumerateStreamsPtr;
-	//TSharedPtr EnumerateStreamsPtr;
 	FOnEnumerateStreamsComplete OnEnumerateStreamsCompleteDelegate;
 
 	//void OnEnumerateStreamsComplete(const TArray<FNetworkReplayStreamInfo, FDefaultAllocator> StreamInfos);
@@ -111,6 +208,10 @@ private:
 	FDeleteFinishedStreamResult OnDeleteFinishedStreamResultDelegate;
 	void OnDeleteFinishedStreamResult(const bool bDeleteSuceeded);
 	//FDeleteFinishedStreamCallback
+
+   
+
+
 
 protected:
 	UFUNCTION(BlueprintImplementableEvent, Category= "Replays")

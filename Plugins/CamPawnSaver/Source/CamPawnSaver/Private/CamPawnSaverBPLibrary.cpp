@@ -28,7 +28,7 @@ void UCamPawnSaverBPLibrary::SaveCameraPawnData(FString FileName, TArray<FCamera
     FFileHelper::SaveStringToFile(FString(FullDataString), *SaveFile);
 }
 
-/*static TArray<FCameraPawnData> LoadCameraPawnData(FString FileName)
+TArray<FCameraPawnData> UCamPawnSaverBPLibrary::LoadCameraPawnData(FString FileName)
 {
     FString SaveDirectory = FPaths::ProjectSavedDir() + TEXT("CameraPawnData/");
     FString SaveFile = SaveDirectory + FileName + TEXT(".bin");
@@ -36,15 +36,35 @@ void UCamPawnSaverBPLibrary::SaveCameraPawnData(FString FileName, TArray<FCamera
     FString DataString;
     FFileHelper::LoadFileToString(DataString, *SaveFile);
 
-    TArray<FCameraPawnData> Data;
+    TArray<FCameraPawnData> Data = TArray<FCameraPawnData>();
 
-    for (int i = 0; i < sizeof(DataString); i += sizeof(FCameraPawnData))
+    // decrypt data
+
+    TArray<FString> DataArray;
+    DataString.ParseIntoArray(DataArray, TEXT("\n"), true);
+
+    for (int i = 0; i < DataArray.Num(); i += 2)
     {
         FCameraPawnData CameraPawnData = FCameraPawnData();
-        memcpy(&CameraPawnData, DataString.GetCharArray().GetData() + i, sizeof(FCameraPawnData));
+        CameraPawnData.CameraName = DataArray[i];
+
+        TArray<FString> DataArray2;
+        DataArray[i + 1].ParseIntoArray(DataArray2, TEXT(";"), true);
+
+        CameraPawnData.LocationX = FCString::Atof(*DataArray2[0]);
+        CameraPawnData.LocationY = FCString::Atof(*DataArray2[1]);
+        CameraPawnData.LocationZ = FCString::Atof(*DataArray2[2]);
+        CameraPawnData.RotationX = FCString::Atof(*DataArray2[3]);
+        CameraPawnData.RotationY = FCString::Atof(*DataArray2[4]);
+        CameraPawnData.RotationZ = FCString::Atof(*DataArray2[5]);
+        CameraPawnData.Duration = FCString::Atof(*DataArray2[6]);
+        CameraPawnData.TimeInit = FCString::Atof(*DataArray2[7]);
+        CameraPawnData.TimeEnd = FCString::Atof(*DataArray2[8]);
+        CameraPawnData.CurrentFocalLength = FCString::Atof(*DataArray2[9]);
+        CameraPawnData.ManualFocus = FCString::Atof(*DataArray2[10]);
 
         Data.Add(CameraPawnData);
     }
 
     return Data;
-}*/
+}

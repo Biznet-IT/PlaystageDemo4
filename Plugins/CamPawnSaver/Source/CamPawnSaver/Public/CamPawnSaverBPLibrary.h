@@ -67,6 +67,6 @@ class UCamPawnSaverBPLibrary : public UBlueprintFunctionLibrary
     UFUNCTION(BlueprintCallable, meta = (DisplayName = "Save Camera Pawn Data", Keywords = "CamPawnSaver save camera pawn data"), Category = "CamPawnSaverTesting")
     static void SaveCameraPawnData(FString FileName, TArray<FCameraPawnData> Data);
 
-    /*UFUNCTION(BlueprintCallable, meta = (DisplayName = "Load Camera Pawn Data", Keywords = "CamPawnSaver load camera pawn data"), Category = "CamPawnSaverTesting")
-    static TArray<FCameraPawnData> LoadCameraPawnData(FString FileName);*/
+    UFUNCTION(BlueprintCallable, meta = (DisplayName = "Load Camera Pawn Data", Keywords = "CamPawnSaver load camera pawn data"), Category = "CamPawnSaverTesting")
+    static TArray<FCameraPawnData> LoadCameraPawnData(FString FileName);
 };

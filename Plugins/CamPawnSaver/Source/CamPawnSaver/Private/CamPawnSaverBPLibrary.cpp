@@ -3,6 +3,19 @@
 #include "CamPawnSaverBPLibrary.h"
 #include "CamPawnSaver.h"
 
+FString encrypt(const FString& input, const FString& key) {
+    FString encrypted = input;
+    for (int i = 0; i < encrypted.Len(); ++i) {
+        encrypted[i] = input[i] ^ key[i % key.Len()];
+    }
+    return encrypted;
+}
+
+// Función para desencriptar una cadena encriptada con la misma clave
+FString decrypt(const FString& encrypted, const FString& key) {
+    return encrypt(encrypted, key); // XOR es su propia inversa
+}
+
 UCamPawnSaverBPLibrary::UCamPawnSaverBPLibrary(const FObjectInitializer& ObjectInitializer)
 : Super(ObjectInitializer)
 {
@@ -21,11 +34,13 @@ void UCamPawnSaverBPLibrary::SaveCameraPawnData(FString FileName, TArray<FCamera
     }
 
     // encrypt data
+    FString EncryptedDataString = encrypt(FullDataString, "PlayStageDemo4");
+
 
     FString SaveDirectory = FPaths::ProjectSavedDir() + TEXT("CameraPawnData/");
     FString SaveFile = SaveDirectory + FileName + TEXT(".bin");
 
-    FFileHelper::SaveStringToFile(FString(FullDataString), *SaveFile);
+    FFileHelper::SaveStringToFile(FString(EncryptedDataString), *SaveFile);
 }
 
 TArray<FCameraPawnData> UCamPawnSaverBPLibrary::LoadCameraPawnData(FString FileName)
@@ -39,9 +54,10 @@ TArray<FCameraPawnData> UCamPawnSaverBPLibrary::LoadCameraPawnData(FString FileN
     TArray<FCameraPawnData> Data = TArray<FCameraPawnData>();
 
     // decrypt data
+    FString DecryptedDataString = decrypt(DataString, "PlayStageDemo4");
 
     TArray<FString> DataArray;
-    DataString.ParseIntoArray(DataArray, TEXT("\n"), true);
+    DecryptedDataString.ParseIntoArray(DataArray, TEXT("\n"), true);
 
     for (int i = 0; i < DataArray.Num(); i += 2)
     {

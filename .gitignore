@@ -72,3 +72,24 @@ Plugins/*/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
+
+
+.DS_Store
+node_modules
+/dist
+
+Content/MetaHumans/Engineer/Face/Engineer_FaceMesh.uasset
+Content/MetaHumans/Geppeto_v00/Face/Geppeto_v00_FaceMesh.uasset
+Content/MetaHumans/Common/Face/Face_Archetype.uasset
+
+Content/MetaHumans/Animacion/Face_geppetoanim.uasset
+Content/Seaside_Town/Maps/Demo_BuiltData.uasset
+
+Content/MetaHumans/Animacion/Face_geppetoanim.FBX
+Content/MetaHumans/Animacion/metahuman_GEPPETO_BODYANIM.uasset
+
+Content/StackOBot/Environment/Rocks/SM_RockFlats_02.uasset
+Content/StackOBot/Environment/Rocks/SM_RockFlats_01.uasset
+Content/DeepElderCaves/Maps/Demonstration.umap
+Content/DeepElderCaves/Maps/Overview.umap
+Content/DeepElderCaves/Maps/Overview02.umap
